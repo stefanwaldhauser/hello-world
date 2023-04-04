@@ -12,6 +12,6 @@ describe("Server", function () {
         const res = await request.get("/");
 
         expect(res.status).toBe(200)
-        expect(res.body).toEqual({"data": "It Works!"})
+        expect(res.body).toEqual({"data": "It Works :)!"})
     });
 });
