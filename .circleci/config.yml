@@ -5,12 +5,31 @@ jobs:
   jb_build_and_test:
     executor: node/default # use the default docker image specified in the orb
     steps:
-      - checkout # It's basically a git clone of your code from your VCS provider into your primary container. Will then navigate to the root of that folder
+      - checkout # SPECIAL STEP: It's basically a git clone of your code from your VCS provider into your primary container. Will then navigate to the root of that folder
+      - run:
+          name: Node Version
+          command: node --version
       - node/install-packages: # basically runs npm install with some caching activated
           pkg-manager: npm # configuration that is provided by that orb (see org documentation)
       - run: # The run step allows you to run custom commands, such as executing the command make test, using a non-login shell by default
           name: Run Unit Tests
           command: npm run test
+      - run:
+          name: Run Build
+          command: npm run build
+      - run:
+          name: PWD
+          command: pwd
+      - run:
+          name: LS
+          command: ls -a
+      - run:
+          name: ECHO home
+          command: echo ~
+      - persist_to_workspace: # special step used to persist a temporary file to be used by another job in the workflow.
+          root: ~/project
+          paths:
+            - .
 workflows:
   wf_build_and_test:
     jobs:
