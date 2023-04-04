@@ -17,20 +17,25 @@ jobs:
       - run:
           name: Run Build
           command: npm run build
-      - run:
-          name: PWD
-          command: pwd
-      - run:
-          name: LS
-          command: ls -a
-      - run:
-          name: ECHO home
-          command: echo ~
       - persist_to_workspace: # special step used to persist a temporary file to be used by another job in the workflow.
           root: ~/project
-          paths:
-            - .
+          paths: .
+  jb_compress_and_upload:
+    executor: node/default
+    steps:
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: Compress Dist
+          command: tar -cvzf myapp.tar ./dist
+      - store_artifacts:
+          path: myapp.tar
+          destination: artifact_name
+
 workflows:
   wf_build_and_test:
     jobs:
       - jb_build_and_test
+      - jb_compress_and_upload:
+          requires:
+            - jb_build_and_test
