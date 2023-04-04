@@ -1,26 +1,17 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine.
-# See: https://circleci.com/docs/configuration-reference
 version: 2.1
-
-# Define a job to be invoked later in a workflow.
-# See: https://circleci.com/docs/configuration-reference/#jobs
+orbs:
+  node: circleci/node@5.1.0
 jobs:
-  say-hello:
-    # Specify the execution environment. You can specify an image from Docker Hub or use one of our convenience images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/configuration-reference/#executor-job
-    docker:
-      - image: cimg/base:stable
-    # Add steps to the job
-    # See: https://circleci.com/docs/configuration-reference/#steps
+  jb_build_and_test:
+    executor: node/default # use the default docker image specified in the orb
     steps:
-      - checkout
-      - run:
-          name: "Say hello"
-          command: "echo Hello, World!"
-
-# Orchestrate jobs using workflows
-# See: https://circleci.com/docs/configuration-reference/#workflows
+      - checkout # It's basically a git clone of your code from your VCS provider into your primary container. Will then navigate to the root of that folder
+      - node/install-packages: # basically runs npm install with some caching activated
+          pkg-manager: npm # configuration that is provided by that orb (see org documentation)
+      - run: # The run step allows you to run custom commands, such as executing the command make test, using a non-login shell by default
+          name: Run Unit Tests
+          command: npm run test
 workflows:
-  say-hello-workflow:
+  wf_build_and_test:
     jobs:
-      - say-hello
+      - jb_build_and_test
